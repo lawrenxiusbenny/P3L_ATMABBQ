@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_view_outer"
+    android:layout_width="wrap_content"
+    android:layout_margin="10dp"
+    android:layout_height="wrap_content"
+    card_view:cardBackgroundColor="@android:color/transparent"
+    card_view:cardCornerRadius="10dp"
+    card_view:cardElevation="3dp"
+    >
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="450px"
+        card_view:cardCornerRadius="4dp"
+        card_view:cardElevation="0dp"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="#EFFFE0"
+        android:layout_marginBottom="3dp"
+        android:id="@+id/ParentAdapter">
+
+        <LinearLayout
+            android:id="@+id/linear_layout_menu"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#bbc2bf"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageMenu"
+                android:layout_width="450px"
+                android:layout_height="320px"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"></ImageView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="450px"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="410px"
+                    android:layout_gravity="center"
+                    android:layout_height="450px">
+
+                    <TextView
+                        android:id="@+id/txtNamaMenu"
+                        android:layout_width="wrap_content"
+                        android:textStyle="bold"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/satisfy"
+                        android:layout_marginTop="16dp"
+                        android:text="Nama Produk"
+
+                        android:textSize="16dp"
+                        card_view:layout_constraintEnd_toEndOf="parent"
+                        card_view:layout_constraintHorizontal_bias="0.012"
+                        card_view:layout_constraintStart_toStartOf="parent"
+                        card_view:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/txtDeskripsiMenu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/satisfy"
+                        android:text="deskripsi produk"
+                        android:textSize="12dp"
+                        card_view:layout_constraintBottom_toBottomOf="parent"
+                        card_view:layout_constraintEnd_toEndOf="parent"
+                        card_view:layout_constraintHorizontal_bias="0.03"
+                        card_view:layout_constraintStart_toStartOf="parent"
+                        card_view:layout_constraintTop_toBottomOf="@id/txtNamaMenu"
+                        card_view:layout_constraintVertical_bias="0.198" />
+
+
+                        <TextView
+                            android:id="@+id/txtHargaMenu"
+                            android:layout_width="wrap_content"
+                            android:fontFamily="@font/satisfy"
+                            android:layout_height="wrap_content"
+                            android:textStyle="bold"
+                            card_view:layout_constraintBottom_toBottomOf="parent"
+                            card_view:layout_constraintEnd_toEndOf="parent"
+                            card_view:layout_constraintHorizontal_bias="0.03"
+                            card_view:layout_constraintStart_toStartOf="parent"
+                            card_view:layout_constraintTop_toTopOf="parent"
+                            card_view:layout_constraintVertical_bias="0.94"
+                            android:text="harga produk"
+                            android:textSize="12dp"
+                            />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnOrder"
+                        android:layout_width="55dp"
+                        android:layout_height="32dp"
+                        android:layout_marginLeft="80dp"
+                        android:layout_marginTop="120dp"
+                        android:backgroundTint="#82916a"
+                        android:fontFamily="@font/satisfy"
+                        android:text="Order"
+                        android:textSize="6dp"
+                        card_view:layout_constraintStart_toStartOf="parent"
+                        card_view:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/txtNot"
+        android:layout_width="225px"
+        android:layout_height="80px"
+        android:text="Not Available"
+        android:transformPivotX="5dp"
+        android:padding="2dp"
+        android:visibility="gone"
+        android:textAlignment="center"
+        android:fontFamily="@font/satisfy"
+        android:textSize="14dp"
+        android:background="#fc5549"/>
+</androidx.cardview.widget.CardView>

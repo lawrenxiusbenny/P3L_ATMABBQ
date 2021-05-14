@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Atma BBQ</string>
+    <string name="title_activity_splash">Atma BBQ</string>
+    <!--    <string name=""></string>-->
+    <string name="hello_world">Hello Square World!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="welcomeTitle">Welcome!</string>
+    <string name="isiSuccess">Please enjoy our food</string>
+
+    <string name="kosongTitle">We are sorry !</string>
+    <string name="isiKosong">This menu is not available for a while</string>
+</resources>
