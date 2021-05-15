@@ -112,7 +112,7 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/txtNot"
-        android:layout_width="225px"
+        android:layout_width="450px"
         android:layout_height="80px"
         android:text="Not Available"
         android:transformPivotX="5dp"

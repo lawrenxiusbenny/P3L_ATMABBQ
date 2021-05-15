@@ -117,7 +117,7 @@ public class MenuFragment extends Fragment {
 
     public void setAdapter(){
         listMenu = new ArrayList<Menu>();
-        recyclerView = view.findViewById(R.id.recycler_view_man);
+        recyclerView = view.findViewById(R.id.recycler_view_menu);
         adapter = new MenuRecyclerViewAdapter(view.getContext(), listMenu);
         int gridData = 2;
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(view.getContext(),gridData);

@@ -76,6 +76,6 @@ dependencies {
 
     implementation 'com.karumi:dexter:6.0.0'
 
-    //Easy Swipe Layout library untuk swipe di recycle view
-    implementation 'com.github.anzaizai:EasySwipeMenuLayout:1.1.4'
+    implementation 'com.chauthai.swipereveallayout:swipe-reveal-layout:1.4.1'
+
 }

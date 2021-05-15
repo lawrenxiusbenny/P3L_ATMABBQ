@@ -25,7 +25,19 @@ public class Pesanan {
         this.nama_customer = nama_customer;
     }
 
-    public Pesanan(int id_pesanan, int id_menu, int id_reservasi, Date tanggal_pemesanan, int jumlah, Double sub_total, int id_stok_keluar, String nama_customer, String gambar_menu, Double harga_menu, String nama_menu) {
+    public Pesanan(int id_menu, int id_reservasi, int jumlah, Double sub_total, int id_stok_keluar, String nama_customer, String gambar_menu, Double harga_menu, String nama_menu) {
+        this.id_menu = id_menu;
+        this.id_reservasi = id_reservasi;
+        this.jumlah = jumlah;
+        this.sub_total = sub_total;
+        this.id_stok_keluar = id_stok_keluar;
+        this.nama_customer = nama_customer;
+        this.gambar_menu = gambar_menu;
+        this.harga_menu = harga_menu;
+        this.nama_menu = nama_menu;
+    }
+
+    public Pesanan(int id_menu, int id_reservasi, Date tanggal_pemesanan, int jumlah, Double sub_total, int id_stok_keluar, String nama_customer, String gambar_menu, Double harga_menu, String nama_menu) {
         this.id_pesanan = id_pesanan;
         this.id_menu = id_menu;
         this.id_reservasi = id_reservasi;
