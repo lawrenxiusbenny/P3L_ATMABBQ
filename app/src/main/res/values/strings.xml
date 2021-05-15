@@ -11,4 +11,10 @@
 
     <string name="kosongTitle">We are sorry !</string>
     <string name="isiKosong">This menu is not available for a while</string>
+
+    <string name="kosongTitleCart">Your cart is empty !</string>
+    <string name="isiKosongCart">Grab your order before it is gone</string>
+
+    <string name="ScanningTitleCart">Oooppss !!</string>
+    <string name="isiScanningCart">You are not scanning yet</string>
 </resources>

@@ -52,13 +52,9 @@ public class MenuFragment extends Fragment {
     private MenuRecyclerViewAdapter adapter;
     private List<Menu> listMenu;
 
-    ProgressBar progressBar;
     ShimmerFrameLayout shimmerFrameLayout;
-    NestedScrollView nestedScrollView;
-//    int page=1, limit=10;
 
     private SearchView editSearch;
-    private SwipeRefreshLayout swipeRefresh;
     private View view;
 
     public MenuFragment(){}
@@ -69,10 +65,8 @@ public class MenuFragment extends Fragment {
         view = inflater.inflate(R.layout.fragment_menu, container, false);
 
         editSearch = (SearchView) view.findViewById(R.id.searchView);
-        swipeRefresh = view.findViewById(R.id.refreshMenu);
-        nestedScrollView = view.findViewById(R.id.scrollView);
         shimmerFrameLayout = view.findViewById(R.id.shimmer_layout);
-        progressBar = view.findViewById(R.id.progress_bar);
+
         loadMenu();
 
         editSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -93,13 +87,6 @@ public class MenuFragment extends Fragment {
     public void loadMenu(){
         setAdapter();
         getMenu();
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                getMenu();
-            }
-        });
-
         shimmerFrameLayout.startShimmer();
 
 //        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
@@ -134,7 +121,6 @@ public class MenuFragment extends Fragment {
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    progressBar.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
                     shimmerFrameLayout.stopShimmer();
                     shimmerFrameLayout.setVisibility(View.GONE);
@@ -159,7 +145,7 @@ public class MenuFragment extends Fragment {
 
 
                     adapter.notifyDataSetChanged();
-//                    swipeRefresh.setRefreshing(false);
+
                 }catch (JSONException e){
                     e.printStackTrace();
                 }

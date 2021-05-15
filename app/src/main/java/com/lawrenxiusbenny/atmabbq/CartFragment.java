@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -26,6 +28,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.google.android.material.button.MaterialButton;
 import com.lawrenxiusbenny.atmabbq.adapter.MenuRecyclerViewAdapter;
 import com.lawrenxiusbenny.atmabbq.adapter.PesananRecyclerViewAdapter;
 import com.lawrenxiusbenny.atmabbq.api.MenuApi;
@@ -37,6 +40,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +54,11 @@ public class CartFragment extends Fragment {
     private PesananRecyclerViewAdapter adapter;
     private List<Pesanan> listPesanan;
 
+    private MaterialButton btnCheckout;
+    private TextView txtTotalHarga;
+
+    private ConstraintLayout layoutbawah;
+
     ShimmerFrameLayout shimmerFrameLayout;
     NestedScrollView nestedScrollView;
 
@@ -59,7 +69,7 @@ public class CartFragment extends Fragment {
     private SearchView editSearch;
     private SwipeRefreshLayout swipeRefresh;
     private View view;
-
+    private ConstraintLayout layoutKosong, layoutScanning;
     public CartFragment() {
         // Required empty public constructor
     }
@@ -71,25 +81,20 @@ public class CartFragment extends Fragment {
 
         editSearch = (SearchView) view.findViewById(R.id.searchViewPesanan);
         swipeRefresh = view.findViewById(R.id.refreshPesanan);
-        nestedScrollView = view.findViewById(R.id.scrollViewPesanan);
         shimmerFrameLayout = view.findViewById(R.id.shimmer_layout_pesanan);
+        layoutKosong = view.findViewById(R.id.layout_kosong);
+        layoutScanning = view.findViewById(R.id.layout_belum_scanning);
+        layoutbawah = view.findViewById(R.id.layout_bawah_cart);
+        txtTotalHarga = view.findViewById(R.id.totalHarga);
+        btnCheckout = view.findViewById(R.id.btnCheckOut);
+
         sPreferences = getActivity().getSharedPreferences("scan", Context.MODE_PRIVATE);
         cekScan = sPreferences.getInt(KEY_ID,Context.MODE_PRIVATE);
-        Toast.makeText(getContext(), String.valueOf(cekScan), Toast.LENGTH_SHORT).show();
-        if(cekScan != 0){
 
+        if(cekScan != 0){
             loadPesanan();
-//            editSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//                @Override
-//                public boolean onQueryTextSubmit(String query) {
-//                    return false;
-//                }
-//                @Override
-//                public boolean onQueryTextChange(String s) {
-//                    adapter.getFilter().filter(s);
-//                    return false;
-//                }
-//            });
+        }else{
+            layoutScanning.setVisibility(View.VISIBLE);
         }
         return view;
     }
@@ -121,12 +126,23 @@ public class CartFragment extends Fragment {
 
     public void setAdapter(){
         listPesanan = new ArrayList<Pesanan>();
-        recyclerView = view.findViewById(R.id.recycler_view_pesanan);
         adapter = new PesananRecyclerViewAdapter(view.getContext(), listPesanan);
+        recyclerView = view.findViewById(R.id.recycler_view_pesanan);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
+        editSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String s) {
+                adapter.getFilter().filter(s);
+                return false;
+            }
+        });
     }
 
     public void getPesanan(){
@@ -137,6 +153,7 @@ public class CartFragment extends Fragment {
             public void onResponse(JSONObject response) {
                 try {
                     recyclerView.setVisibility(View.VISIBLE);
+                    layoutbawah.setVisibility(View.VISIBLE);
                     shimmerFrameLayout.stopShimmer();
                     shimmerFrameLayout.setVisibility(View.GONE);
                     JSONArray jsonArray = response.getJSONArray("data");
@@ -156,23 +173,32 @@ public class CartFragment extends Fragment {
                         Double harga_menu     = jsonObject.optDouble("harga_menu");
                         String gambar_menu    = jsonObject.optString("gambar_menu");
 
-                        Toast.makeText(getContext(), String.valueOf(id_menu), Toast.LENGTH_SHORT).show();
                         Pesanan pesanan = new Pesanan(id_menu,id_reservasi,jumlah,sub_total,id_stok_keluar,
-                                                        nama_customer,gambar_menu,harga_menu,nama_menu);
+                                nama_customer,gambar_menu,harga_menu,nama_menu);
                         listPesanan.add(pesanan);
                     }
+
+                    double harga = response.getDouble("total");
+
+                    Toast.makeText(getContext(), String.valueOf(harga), Toast.LENGTH_SHORT).show();
+
+                    NumberFormat formatter = new DecimalFormat("#,###");
+
+                    txtTotalHarga.setText("IDR "+ formatter.format(harga));
+
                     adapter.notifyDataSetChanged();
-//                    swipeRefresh.setRefreshing(false);
+                    swipeRefresh.setRefreshing(false);
                 }catch (JSONException e){
                     e.printStackTrace();
                     Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    swipeRefresh.setRefreshing(false);
+                    layoutKosong.setVisibility(View.VISIBLE);
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                swipeRefresh.setRefreshing(false);
-                Toast.makeText(view.getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                swipeRefresh.setRefreshing(false);
                 Log.e("error",error.getMessage());
             }
         });

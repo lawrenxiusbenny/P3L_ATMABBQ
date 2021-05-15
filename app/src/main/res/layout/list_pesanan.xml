@@ -3,6 +3,7 @@
 <com.chauthai.swipereveallayout.SwipeRevealLayout android:layout_width="match_parent"
     android:id="@+id/swipeLayout"
     android:layout_height="wrap_content"
+    android:layout_margin="10dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:mode="same_level"
@@ -17,8 +18,9 @@
             android:id="@+id/textEdit"
             android:layout_width="100dp"
             android:layout_height="match_parent"
-            android:background="@color/teal_200"
+            android:background="#6578b5"
             android:gravity="center"
+            android:fontFamily="@font/satisfy"
             android:text="EDIT"
             android:textColor="@color/white"/>
 
@@ -26,8 +28,9 @@
             android:id="@+id/textDelete"
             android:layout_width="100dp"
             android:layout_height="match_parent"
-            android:background="@color/purple_500"
+            android:background="#b56565"
             android:gravity="center"
+            android:fontFamily="@font/satisfy"
             android:text="DELETE"
             android:textColor="@color/white"/>
     </LinearLayout>
@@ -38,7 +41,6 @@
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         card_view:cardBackgroundColor="@color/warnaDialog"
-        android:layout_margin="10dp"
         card_view:cardCornerRadius="10dp"
         card_view:cardElevation="3dp"
         xmlns:android="http://schemas.android.com/apk/res/android">
