@@ -65,8 +65,18 @@
                 app:layout_constraintTop_toBottomOf="@+id/textIsiCheckout"
                 app:layout_constraintVertical_bias="0.0" />
 
+            <ProgressBar
+                android:id="@+id/pbCheckout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
             <Button
-                android:id="@+id/closeBtnCheckout"
+                android:id="@+id/proceedBtnCheckout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
@@ -83,7 +93,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <Button
-                android:id="@+id/proceedBtnCheckout"
+                android:id="@+id/closeBtnCheckout"
                 android:layout_width="wrap_content"
                 app:backgroundTint="#a6b090"
                 android:layout_height="wrap_content"

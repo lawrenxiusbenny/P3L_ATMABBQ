@@ -2,14 +2,10 @@ package com.lawrenxiusbenny.atmabbq;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
-
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -17,14 +13,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.etebarian.meowbottomnavigation.MeowBottomNavigation;
 import com.lawrenxiusbenny.atmabbq.api.PesananApi;
-import com.lawrenxiusbenny.atmabbq.model.Pesanan;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.List;
-
 import static com.android.volley.Request.Method.GET;
 
 public class MainActivity extends AppCompatActivity {

@@ -1,29 +1,16 @@
 package com.lawrenxiusbenny.atmabbq;
 
-import android.content.res.Configuration;
 import android.os.Bundle;
-
-import android.app.SearchManager;
-import android.widget.ProgressBar;
 import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
-
-import androidx.annotation.MenuRes;
-//import androidx.appcompat.widget.SearchView;
-import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -33,16 +20,12 @@ import com.facebook.shimmer.ShimmerFrameLayout;
 import com.lawrenxiusbenny.atmabbq.adapter.MenuRecyclerViewAdapter;
 import com.lawrenxiusbenny.atmabbq.api.MenuApi;
 import com.lawrenxiusbenny.atmabbq.model.Menu;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
 
 import static com.android.volley.Request.Method.GET;
 
@@ -98,17 +81,6 @@ public class MenuFragment extends Fragment {
             }
         });
 
-//        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-//            @Override
-//            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-//                if(scrollY == v.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight()){
-//                    page++;
-//                    progressBar.setVisibility(View.VISIBLE);
-//
-//                    getMenu();
-//                }
-//            }
-//        });
     }
 
     public void setAdapter(){
@@ -117,7 +89,6 @@ public class MenuFragment extends Fragment {
         adapter = new MenuRecyclerViewAdapter(view.getContext(), listMenu);
         int gridData = 2;
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(view.getContext(),gridData);
-//        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
@@ -161,7 +132,6 @@ public class MenuFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 swipeRefresh.setRefreshing(false);
-//                Toast.makeText(view.getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("error",error.getMessage());
             }
         });

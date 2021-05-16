@@ -1,7 +1,6 @@
 package com.lawrenxiusbenny.atmabbq;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -12,15 +11,17 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -35,25 +36,20 @@ import com.android.volley.toolbox.Volley;
 import com.etebarian.meowbottomnavigation.MeowBottomNavigation;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.button.MaterialButton;
-import com.lawrenxiusbenny.atmabbq.adapter.MenuRecyclerViewAdapter;
 import com.lawrenxiusbenny.atmabbq.adapter.PesananRecyclerViewAdapter;
-import com.lawrenxiusbenny.atmabbq.api.MenuApi;
 import com.lawrenxiusbenny.atmabbq.api.PesananApi;
-import com.lawrenxiusbenny.atmabbq.model.Menu;
 import com.lawrenxiusbenny.atmabbq.model.Pesanan;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import static com.android.volley.Request.Method.GET;
 import static com.android.volley.Request.Method.PUT;
 
@@ -251,6 +247,7 @@ public class CartFragment extends Fragment {
             public void onClick(View view) {
                 ubahStatus(cekScan);
                 layoutScanning.setVisibility(View.VISIBLE);
+                dialog.dismiss();
             }
         });
     }
@@ -265,37 +262,30 @@ public class CartFragment extends Fragment {
         //Pendeklarasian queue
         RequestQueue queue = Volley.newRequestQueue(view.getContext());
 
-        final ProgressDialog progressDialog;
-        progressDialog = new ProgressDialog(view.getContext());
-        progressDialog.setMessage("loading....");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
 
         StringRequest stringRequest = new StringRequest(PUT, PesananApi.ROOT_CHECKOUT + id_reservasi, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                progressDialog.dismiss();
                 try {
                     JSONObject obj = new JSONObject(response);
                     String status=  obj.getString("status");
                     if(status.equalsIgnoreCase("success")){
                         getDataToPreferences();
-                        Toast.makeText(view.getContext(),"Checkout successful ! Please proceed to payment at cashier", Toast.LENGTH_SHORT).show();
+                        FancyToast.makeText(view.getContext(), "Checkout successful ! Please proceed to payment at cashier",FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();
                         meowBottomNavigation.clearAllCounts();
                     }else{
-                        Toast.makeText(view.getContext(),"Checkout fail ! Please try again", Toast.LENGTH_SHORT).show();
+                        FancyToast.makeText(view.getContext(), "Checkout fail ! Please try again",FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
                     }
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(view.getContext(), "Network unstable, please try again", Toast.LENGTH_SHORT).show();
+                    FancyToast.makeText(view.getContext(), "Network unstable, please try again",FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                progressDialog.dismiss();
-                Toast.makeText(view.getContext(), "Network unstable, please try again", Toast.LENGTH_SHORT).show();
+                FancyToast.makeText(view.getContext(), "Network unstable, please try again",FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
             }
         }){
             @Override

@@ -1,15 +1,12 @@
 package com.lawrenxiusbenny.atmabbq.adapter;
 
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,19 +16,11 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
@@ -43,25 +32,18 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 import com.lawrenxiusbenny.atmabbq.MainActivity;
 import com.lawrenxiusbenny.atmabbq.R;
+import com.lawrenxiusbenny.atmabbq.SplashActivity;
 import com.lawrenxiusbenny.atmabbq.api.PesananApi;
 import com.lawrenxiusbenny.atmabbq.model.Menu;
-import com.lawrenxiusbenny.atmabbq.model.Pesanan;
-
-import org.json.JSONArray;
+import com.shashank.sony.fancytoastlib.FancyToast;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.android.volley.Request.Method.GET;
 import static com.android.volley.Request.Method.POST;
 
 public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<MenuRecyclerViewAdapter.MenuViewHolder>{
@@ -110,7 +92,6 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<MenuRecyclerVi
 
         ShimmerDrawable shimmerDrawable = new ShimmerDrawable();
         shimmerDrawable.setShimmer(shimmer);
-
         NumberFormat formatter = new DecimalFormat("#,###");
         holder.txtNama.setText(menu.getNama_menu());
         holder.txtdeskripsi.setText(menu.getDeskripsi_menu());
@@ -295,33 +276,21 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<MenuRecyclerVi
     public void addPesanan(final int id_menu, final int id_reservasi, final int jumlah){
         RequestQueue queue = Volley.newRequestQueue(context);
 
-        final ProgressDialog progressDialog;
-        progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage("loading....");
-        progressDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
-
         StringRequest stringRequest = new StringRequest(POST, PesananApi.ROOT_INSERT, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                progressDialog.dismiss();
                 try {
                     JSONObject obj = new JSONObject(response);
-                    Toast.makeText(context, obj.getString("message"), Toast.LENGTH_SHORT).show();
-
-                    //untuk update bottomnavigation jumlah cart
-//                    bottomNavigation = ()
+                    FancyToast.makeText(context, obj.getString("message"),FancyToast.LENGTH_SHORT, FancyToast.SUCCESS, false).show();
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    Toast.makeText(context, "Network unstable, please try again", Toast.LENGTH_SHORT).show();
+                    FancyToast.makeText(context, "Network unstable, please try again",FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                progressDialog.dismiss();
-                Toast.makeText(context, "Network unstable, please try again", Toast.LENGTH_SHORT).show();
+                FancyToast.makeText(context, "Network unstable, please try again",FancyToast.LENGTH_SHORT, FancyToast.ERROR, false).show();
                 error.printStackTrace();
             }
         }){

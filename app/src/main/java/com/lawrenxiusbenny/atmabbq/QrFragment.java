@@ -3,33 +3,22 @@ package com.lawrenxiusbenny.atmabbq;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.budiyev.android.codescanner.CodeScanner;
 import com.budiyev.android.codescanner.CodeScannerView;
 import com.budiyev.android.codescanner.DecodeCallback;
@@ -41,23 +30,11 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
-import com.lawrenxiusbenny.atmabbq.api.MenuApi;
-import com.lawrenxiusbenny.atmabbq.api.PesananApi;
-import com.lawrenxiusbenny.atmabbq.model.Menu;
-import com.lawrenxiusbenny.atmabbq.model.Pesanan;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
-
-import static com.android.volley.Request.Method.GET;
+import com.shashank.sony.fancytoastlib.FancyToast;
 
 public class QrFragment extends Fragment {
 
     private View view;
-    private View view2;
     private CodeScannerView scannerView;
     private CodeScanner codeScanner;
     private Fragment fragment=null;
@@ -134,7 +111,7 @@ public class QrFragment extends Fragment {
 
             @Override
             public void onPermissionDenied(PermissionDeniedResponse response) {
-                Toast.makeText(view.getContext(), "menutup kamera", Toast.LENGTH_SHORT).show();
+                FancyToast.makeText(view.getContext(), "closing the camera",FancyToast.LENGTH_SHORT, FancyToast.CONFUSING, false).show();
             }
 
             @Override
@@ -149,7 +126,6 @@ public class QrFragment extends Fragment {
         editor = sPreferences.edit();
         editor.putInt(KEY_ID,id);
         editor.commit();
-        Toast.makeText(view.getContext(), String.valueOf(id), Toast.LENGTH_SHORT).show();
     }
 
     private void loadFragment(Fragment fragment){
