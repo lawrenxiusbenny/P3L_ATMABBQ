@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -139,65 +140,77 @@ public class MenuRecyclerViewAdapter extends RecyclerView.Adapter<MenuRecyclerVi
 
                     sPreferences = context.getSharedPreferences("scan", Context.MODE_PRIVATE);
                     id_reservasi = sPreferences.getInt(KEY_ID,Context.MODE_PRIVATE);
-
-                    Dialog dialog;
-                    dialog = new Dialog(context);
-                    dialog.setContentView(R.layout.dialog_tambah_edit);
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    dialog.show();
-                    MaterialButton btnCancel = dialog.findViewById(R.id.btnCancel);
-                    MaterialButton btnAdd = dialog.findViewById(R.id.btnAddEdit);
-                    TextInputEditText txtInput = dialog.findViewById(R.id.txtInputEdtTambah);
-                    ImageView imgAdd = dialog.findViewById(R.id.ivTambahEdit);
-                    TextView txtAvailable = dialog.findViewById(R.id.jumlahTersediaAdd);
-                    TextView txtNamaAdd = dialog.findViewById(R.id.namaMenuAdd);
-                    TextView txtHargaAdd = dialog.findViewById(R.id.HargaMenuAdd);
-
-
-
-                    double stok = menu.getStok_bahan();
-                    double serving = menu.getServing_size();
-
-                    double available = Math.floor(stok/serving);
-                    txtNamaAdd.setText(menu.getNama_menu());
-                    if(menu.getHarga_menu()==0){
-                        txtHargaAdd.setText("Free");
+                    if(id_reservasi==0){
+                        Dialog dialog;
+                        dialog = new Dialog(context);
+                        dialog.setContentView(R.layout.dialog_scanning);
+                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialog.show();
+                        Button btnClose = dialog.findViewById(R.id.btnCloseScanning);
+                        btnClose.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                dialog.dismiss();
+                            }
+                        });
                     }else{
-                        txtHargaAdd.setText("IDR "+ formatter.format(menu.getHarga_menu()));
-                    }
-                    Glide.with(context)
-                            .load("http://be.atmabbq.xyz/menus/"+menu.getGambar_menu())
-                            .placeholder(shimmerDrawable)
-                            .into(imgAdd);
-                    txtAvailable.setText(String.valueOf(available));
+                        Dialog dialog;
+                        dialog = new Dialog(context);
+                        dialog.setContentView(R.layout.dialog_tambah_edit);
+                        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                        dialog.show();
+                        MaterialButton btnCancel = dialog.findViewById(R.id.btnCancel);
+                        MaterialButton btnAdd = dialog.findViewById(R.id.btnAddEdit);
+                        TextInputEditText txtInput = dialog.findViewById(R.id.txtInputEdtTambah);
+                        ImageView imgAdd = dialog.findViewById(R.id.ivTambahEdit);
+                        TextView txtAvailable = dialog.findViewById(R.id.jumlahTersediaAdd);
+                        TextView txtNamaAdd = dialog.findViewById(R.id.namaMenuAdd);
+                        TextView txtHargaAdd = dialog.findViewById(R.id.HargaMenuAdd);
 
-                    btnCancel.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            dialog.dismiss();
+                        double stok = menu.getStok_bahan();
+                        double serving = menu.getServing_size();
+
+                        double available = Math.floor(stok/serving);
+                        txtNamaAdd.setText(menu.getNama_menu());
+                        if(menu.getHarga_menu()==0){
+                            txtHargaAdd.setText("Free");
+                        }else{
+                            txtHargaAdd.setText("IDR "+ formatter.format(menu.getHarga_menu()));
                         }
-                    });
+                        Glide.with(context)
+                                .load("http://be.atmabbq.xyz/menus/"+menu.getGambar_menu())
+                                .placeholder(shimmerDrawable)
+                                .into(imgAdd);
+                        txtAvailable.setText(String.valueOf(available));
 
-                    btnAdd.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if(txtInput.getText().toString().length() == 0){
-                                txtInput.setError("cannot be null");
-                            }else{
-                                int input = Integer.parseInt(txtInput.getText().toString());
-                                if(input < 1){
-                                    txtInput.setError("should be at least 1");
-                                } else if(input>available) {
-                                    txtInput.setError("should be less than available number");
+                        btnCancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        btnAdd.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if(txtInput.getText().toString().length() == 0){
+                                    txtInput.setError("cannot be null");
                                 }else{
-                                    addPesanan(menu.getId_menu(),id_reservasi,Integer.parseInt(txtInput.getText().toString()));
-                                    dialog.dismiss();
-                                    Intent i = new Intent(context,MainActivity.class);
-                                    context.startActivity(i);
+                                    int input = Integer.parseInt(txtInput.getText().toString());
+                                    if(input < 1){
+                                        txtInput.setError("should be at least 1");
+                                    } else if(input>available) {
+                                        txtInput.setError("should be less than available number");
+                                    }else{
+                                        addPesanan(menu.getId_menu(),id_reservasi,Integer.parseInt(txtInput.getText().toString()));
+                                        dialog.dismiss();
+                                        Intent i = new Intent(context,MainActivity.class);
+                                        context.startActivity(i);
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             });
         }

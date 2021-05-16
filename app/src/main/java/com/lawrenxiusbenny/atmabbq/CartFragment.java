@@ -1,8 +1,11 @@
 package com.lawrenxiusbenny.atmabbq;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -18,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -227,8 +231,28 @@ public class CartFragment extends Fragment {
     }
 
     public void checkOut(){
-        ubahStatus(cekScan);
-        layoutScanning.setVisibility(View.VISIBLE);
+        Dialog dialog;
+        dialog = new Dialog(view.getContext());
+        dialog.setContentView(R.layout.dialog_checkout);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+        Button btnClose = dialog.findViewById(R.id.closeBtnCheckout);
+        Button btnProceed = dialog.findViewById(R.id.proceedBtnCheckout);
+
+        btnClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        btnProceed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ubahStatus(cekScan);
+                layoutScanning.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     public void getDataToPreferences(){

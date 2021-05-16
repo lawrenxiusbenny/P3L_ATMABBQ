@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -222,10 +223,30 @@ public class PesananRecyclerViewAdapter extends RecyclerView.Adapter<PesananRecy
             txtDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    deleteData(pesanan.getId_pesanan());
-                    Fragment fragment = new CartFragment();
-                    loadFragment(fragment);
-//                    getPesanan();
+                    Dialog dialog;
+                    dialog = new Dialog(context);
+                    dialog.setContentView(R.layout.dialog_tambah_edit);
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    dialog.show();
+
+                    Button btnCancel = dialog.findViewById(R.id.btnCloseDelete);
+                    Button btnDelete = dialog.findViewById(R.id.btnDelete);
+
+                    btnCancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    btnDelete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            deleteData(pesanan.getId_pesanan());
+                            Fragment fragment = new CartFragment();
+                            loadFragment(fragment);
+                        }
+                    });
                 }
             });
         }
@@ -307,64 +328,6 @@ public class PesananRecyclerViewAdapter extends RecyclerView.Adapter<PesananRecy
                 return params;
             }
         };
-        queue.add(stringRequest);
-    }
-
-    public void getPesanan(){
-        RequestQueue queue = Volley.newRequestQueue(context);
-
-        sPreferences = context.getSharedPreferences("scan", Context.MODE_PRIVATE);
-        id_reservasi = sPreferences.getInt(KEY_ID,Context.MODE_PRIVATE);
-
-        final JsonObjectRequest stringRequest = new JsonObjectRequest(GET, PesananApi.ROOT_SELECT+id_reservasi, null, new com.android.volley.Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                try {
-                    JSONArray jsonArray = response.getJSONArray("data");
-                    List<Pesanan> listUpdate = new ArrayList<>();
-                    int jumlahBaru = 0;
-
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject jsonObject = (JSONObject) jsonArray.get(i);
-
-                        int id_pesanan          = jsonObject.optInt("id_pesanan");
-                        int id_menu           = jsonObject.optInt("id_menu");
-                        int id_reservasi           = jsonObject.optInt("id_reservasi");
-                        int jumlah           = jsonObject.optInt("jumlah");
-                        Double sub_total     = jsonObject.optDouble("sub_total");
-                        int id_stok_keluar           = jsonObject.optInt("id_stok_keluar");
-                        String nama_customer      = jsonObject.optString("nama_customer");
-                        String nama_menu      = jsonObject.optString("nama_menu");
-                        Double harga_menu     = jsonObject.optDouble("harga_menu");
-                        String gambar_menu    = jsonObject.optString("gambar_menu");
-                        int serving_size           = jsonObject.optInt("serving_size");
-                        int stok_bahan           = jsonObject.optInt("stok_bahan");
-
-                        Pesanan pesanan = new Pesanan(id_pesanan,id_menu,id_reservasi,jumlah,sub_total,id_stok_keluar,
-                                nama_customer,gambar_menu,harga_menu,nama_menu,serving_size,stok_bahan);
-                        listUpdate.add(pesanan);
-
-                        jumlahBaru = jumlahBaru+jumlah;
-                    }
-                    pesananListFiltered.clear();
-                    pesananListFiltered = listUpdate;
-                    notifyDataSetChanged();
-
-                    double harga = response.getDouble("total");
-
-                    NumberFormat formatter = new DecimalFormat("#,###");
-
-//                    txtTotalHarga.setText("IDR "+ formatter.format(harga));
-                }catch (JSONException e){
-                    e.printStackTrace();
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("error",error.getMessage());
-            }
-        });
         queue.add(stringRequest);
     }
 

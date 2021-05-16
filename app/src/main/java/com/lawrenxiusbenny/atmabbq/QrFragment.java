@@ -162,9 +162,6 @@ public class QrFragment extends Fragment {
 
                 dialog.setContentView(R.layout.success_dialog);
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-//                dialog.getWindow().setLayout(850,1100);
-
-//                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ffffff")));
 
                 btnClose = dialog.findViewById(R.id.closeBtn);
                 txtTitle = dialog.findViewById(R.id.textTitleSuccess);

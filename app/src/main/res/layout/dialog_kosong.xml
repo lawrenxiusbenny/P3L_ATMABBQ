@@ -57,10 +57,10 @@
 
             <pl.droidsonroids.gif.GifImageView
                 android:id="@+id/gifImageView"
-                android:layout_width="143dp"
-                android:layout_height="125dp"
+                android:layout_width="198dp"
+                android:layout_height="201dp"
                 android:layout_marginTop="4dp"
-                android:src="@drawable/empty"
+                android:src="@drawable/chef_sad"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.504"
@@ -76,6 +76,7 @@
                 android:layout_marginBottom="50px"
                 android:background="@drawable/btn_bg"
                 android:text="Close"
+                android:fontFamily="@font/satisfy"
                 android:textColor="@color/black"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

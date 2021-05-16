@@ -12,6 +12,12 @@
     <string name="kosongTitle">We are sorry !</string>
     <string name="isiKosong">This menu is not available for a while</string>
 
+    <string name="CheckoutTitle">Confirmation Checkout</string>
+    <string name="isiCheckout">Click proceed to confirm checkout</string>
+
+    <string name="DeleteTitle">Confirmation Delete</string>
+    <string name="isiDelete">Do you wanna delete selected order?</string>
+
     <string name="kosongTitleCart">Your cart is empty !</string>
     <string name="isiKosongCart">Grab your order before it is gone</string>
 
