@@ -16,6 +16,9 @@ public class Pesanan {
     public String gambar_menu;
     public Double harga_menu;
     public String nama_menu;
+    public int serving_size;
+
+    public int stok_bahan;
 
 
     public Pesanan() {
@@ -25,7 +28,9 @@ public class Pesanan {
         this.nama_customer = nama_customer;
     }
 
-    public Pesanan(int id_menu, int id_reservasi, int jumlah, Double sub_total, int id_stok_keluar, String nama_customer, String gambar_menu, Double harga_menu, String nama_menu) {
+    public Pesanan(int id_pesanan,int id_menu, int id_reservasi, int jumlah, Double sub_total, int id_stok_keluar,
+                   String nama_customer, String gambar_menu, Double harga_menu, String nama_menu, int serving_size, int stok_bahan) {
+        this.id_pesanan = id_pesanan;
         this.id_menu = id_menu;
         this.id_reservasi = id_reservasi;
         this.jumlah = jumlah;
@@ -35,6 +40,8 @@ public class Pesanan {
         this.gambar_menu = gambar_menu;
         this.harga_menu = harga_menu;
         this.nama_menu = nama_menu;
+        this.serving_size = serving_size;
+        this.stok_bahan = stok_bahan;
     }
 
     public Pesanan(int id_menu, int id_reservasi, Date tanggal_pemesanan, int jumlah, Double sub_total, int id_stok_keluar, String nama_customer, String gambar_menu, Double harga_menu, String nama_menu) {
@@ -153,5 +160,21 @@ public class Pesanan {
 
     public void setNama_menu(String nama_menu) {
         this.nama_menu = nama_menu;
+    }
+
+    public int getServing_size() {
+        return serving_size;
+    }
+
+    public void setServing_size(int serving_size) {
+        this.serving_size = serving_size;
+    }
+
+    public int getStok_bahan() {
+        return stok_bahan;
+    }
+
+    public void setStok_bahan(int stok_bahan) {
+        this.stok_bahan = stok_bahan;
     }
 }

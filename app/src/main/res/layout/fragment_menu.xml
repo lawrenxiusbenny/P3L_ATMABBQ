@@ -83,11 +83,16 @@
                 </LinearLayout>
             </com.facebook.shimmer.ShimmerFrameLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view_menu"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/refreshMenu"
                 android:layout_width="match_parent"
-                android:visibility="gone"
-                android:layout_height="850dp" />
+                android:layout_height="850dp">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view_menu"
+                    android:layout_width="match_parent"
+                    android:visibility="gone"
+                    android:layout_height="850dp" />
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         </LinearLayout>
     </FrameLayout>
 </ScrollView>

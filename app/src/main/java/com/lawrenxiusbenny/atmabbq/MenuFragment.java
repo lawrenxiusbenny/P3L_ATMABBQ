@@ -57,6 +57,8 @@ public class MenuFragment extends Fragment {
     private SearchView editSearch;
     private View view;
 
+    private SwipeRefreshLayout swipeRefresh;
+
     public MenuFragment(){}
 
     @Override
@@ -66,7 +68,7 @@ public class MenuFragment extends Fragment {
 
         editSearch = (SearchView) view.findViewById(R.id.searchView);
         shimmerFrameLayout = view.findViewById(R.id.shimmer_layout);
-
+        swipeRefresh = view.findViewById(R.id.refreshMenu);
         loadMenu();
 
         editSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -88,6 +90,13 @@ public class MenuFragment extends Fragment {
         setAdapter();
         getMenu();
         shimmerFrameLayout.startShimmer();
+
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getMenu();
+            }
+        });
 
 //        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
 //            @Override
@@ -141,19 +150,17 @@ public class MenuFragment extends Fragment {
                         Menu menu = new Menu(id_menu,nama_menu,harga_menu,deskripsi_menu,gambar_menu,serving_size,stok_bahan);
                         listMenu.add(menu);
                     }
-                    int jumlah = listMenu.size();
-
-
                     adapter.notifyDataSetChanged();
-
+                    swipeRefresh.setRefreshing(false);
                 }catch (JSONException e){
+                    swipeRefresh.setRefreshing(false);
                     e.printStackTrace();
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                swipeRefresh.setRefreshing(false);
+                swipeRefresh.setRefreshing(false);
 //                Toast.makeText(view.getContext(), error.getMessage(), Toast.LENGTH_SHORT).show();
                 Log.e("error",error.getMessage());
             }

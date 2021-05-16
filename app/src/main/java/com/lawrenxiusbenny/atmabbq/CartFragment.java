@@ -1,5 +1,6 @@
 package com.lawrenxiusbenny.atmabbq;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,7 +18,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +26,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.etebarian.meowbottomnavigation.MeowBottomNavigation;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.material.button.MaterialButton;
 import com.lawrenxiusbenny.atmabbq.adapter.MenuRecyclerViewAdapter;
@@ -44,9 +46,12 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.android.volley.Request.Method.GET;
+import static com.android.volley.Request.Method.PUT;
 
 public class CartFragment extends Fragment {
 
@@ -58,12 +63,14 @@ public class CartFragment extends Fragment {
     private TextView txtTotalHarga;
 
     private ConstraintLayout layoutbawah;
+    MeowBottomNavigation meowBottomNavigation;
 
     ShimmerFrameLayout shimmerFrameLayout;
     NestedScrollView nestedScrollView;
 
     private SharedPreferences sPreferences;
     public static final String KEY_ID = "id_reservasi";
+    private SharedPreferences.Editor editor;
     int cekScan = 0;
 
     private SearchView editSearch;
@@ -87,9 +94,17 @@ public class CartFragment extends Fragment {
         layoutbawah = view.findViewById(R.id.layout_bawah_cart);
         txtTotalHarga = view.findViewById(R.id.totalHarga);
         btnCheckout = view.findViewById(R.id.btnCheckOut);
+        meowBottomNavigation = getActivity().findViewById(R.id.bottom_navigation);
 
         sPreferences = getActivity().getSharedPreferences("scan", Context.MODE_PRIVATE);
         cekScan = sPreferences.getInt(KEY_ID,Context.MODE_PRIVATE);
+
+        btnCheckout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                checkOut();
+            }
+        });
 
         if(cekScan != 0){
             loadPesanan();
@@ -159,10 +174,12 @@ public class CartFragment extends Fragment {
                     JSONArray jsonArray = response.getJSONArray("data");
                     if(!listPesanan.isEmpty())
                         listPesanan.clear();
+                    int total =0;
 
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 
+                        int id_pesanan          = jsonObject.optInt("id_pesanan");
                         int id_menu           = jsonObject.optInt("id_menu");
                         int id_reservasi           = jsonObject.optInt("id_reservasi");
                         int jumlah           = jsonObject.optInt("jumlah");
@@ -172,15 +189,18 @@ public class CartFragment extends Fragment {
                         String nama_menu      = jsonObject.optString("nama_menu");
                         Double harga_menu     = jsonObject.optDouble("harga_menu");
                         String gambar_menu    = jsonObject.optString("gambar_menu");
+                        int serving_size           = jsonObject.optInt("serving_size");
+                        int stok_bahan           = jsonObject.optInt("stok_bahan");
 
-                        Pesanan pesanan = new Pesanan(id_menu,id_reservasi,jumlah,sub_total,id_stok_keluar,
-                                nama_customer,gambar_menu,harga_menu,nama_menu);
+                        Pesanan pesanan = new Pesanan(id_pesanan,id_menu,id_reservasi,jumlah,sub_total,id_stok_keluar,
+                                nama_customer,gambar_menu,harga_menu,nama_menu,serving_size,stok_bahan);
                         listPesanan.add(pesanan);
+                        total = total+jumlah;
                     }
 
-                    double harga = response.getDouble("total");
+                    meowBottomNavigation.setCount(2,String.valueOf(total));
 
-                    Toast.makeText(getContext(), String.valueOf(harga), Toast.LENGTH_SHORT).show();
+                    double harga = response.getDouble("total");
 
                     NumberFormat formatter = new DecimalFormat("#,###");
 
@@ -190,9 +210,9 @@ public class CartFragment extends Fragment {
                     swipeRefresh.setRefreshing(false);
                 }catch (JSONException e){
                     e.printStackTrace();
-                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     swipeRefresh.setRefreshing(false);
                     layoutKosong.setVisibility(View.VISIBLE);
+                    meowBottomNavigation.clearAllCounts();
                 }
             }
         }, new Response.ErrorListener() {
@@ -200,8 +220,68 @@ public class CartFragment extends Fragment {
             public void onErrorResponse(VolleyError error) {
                 swipeRefresh.setRefreshing(false);
                 Log.e("error",error.getMessage());
+                meowBottomNavigation.clearAllCounts();
             }
         });
+        queue.add(stringRequest);
+    }
+
+    public void checkOut(){
+        ubahStatus(cekScan);
+        layoutScanning.setVisibility(View.VISIBLE);
+    }
+
+    public void getDataToPreferences(){
+        editor = sPreferences.edit();
+        editor.putInt(KEY_ID,0);
+        editor.commit();
+    }
+
+    public void ubahStatus(int id_reservasi){
+        //Pendeklarasian queue
+        RequestQueue queue = Volley.newRequestQueue(view.getContext());
+
+        final ProgressDialog progressDialog;
+        progressDialog = new ProgressDialog(view.getContext());
+        progressDialog.setMessage("loading....");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+
+        StringRequest stringRequest = new StringRequest(PUT, PesananApi.ROOT_CHECKOUT + id_reservasi, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                progressDialog.dismiss();
+                try {
+                    JSONObject obj = new JSONObject(response);
+                    String status=  obj.getString("status");
+                    if(status.equalsIgnoreCase("success")){
+                        getDataToPreferences();
+                        Toast.makeText(view.getContext(),"Checkout successful ! Please proceed to payment at cashier", Toast.LENGTH_SHORT).show();
+                        meowBottomNavigation.clearAllCounts();
+                    }else{
+                        Toast.makeText(view.getContext(),"Checkout fail ! Please try again", Toast.LENGTH_SHORT).show();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(view.getContext(), "Network unstable, please try again", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressDialog.dismiss();
+                Toast.makeText(view.getContext(), "Network unstable, please try again", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+
+                return params;
+            }
+        };
         queue.add(stringRequest);
     }
 }

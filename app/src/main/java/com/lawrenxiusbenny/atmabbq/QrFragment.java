@@ -161,6 +161,7 @@ public class QrFragment extends Fragment {
                 progressBar.setVisibility(View.GONE);
 
                 dialog.setContentView(R.layout.success_dialog);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 //                dialog.getWindow().setLayout(850,1100);
 
 //                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ffffff")));

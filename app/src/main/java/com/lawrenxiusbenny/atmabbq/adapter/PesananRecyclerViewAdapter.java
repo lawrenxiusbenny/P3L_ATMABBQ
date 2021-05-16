@@ -1,7 +1,14 @@
 package com.lawrenxiusbenny.atmabbq.adapter;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,30 +16,60 @@ import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.chauthai.swipereveallayout.SwipeRevealLayout;
 
 import com.chauthai.swipereveallayout.ViewBinderHelper;
+import com.etebarian.meowbottomnavigation.MeowBottomNavigation;
 import com.facebook.shimmer.Shimmer;
 import com.facebook.shimmer.ShimmerDrawable;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
+import com.lawrenxiusbenny.atmabbq.CartFragment;
+import com.lawrenxiusbenny.atmabbq.MainActivity;
 import com.lawrenxiusbenny.atmabbq.R;
+import com.lawrenxiusbenny.atmabbq.api.PesananApi;
 import com.lawrenxiusbenny.atmabbq.model.Pesanan;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static com.android.volley.Request.Method.GET;
+import static com.android.volley.Request.Method.PUT;
 
 public class PesananRecyclerViewAdapter extends RecyclerView.Adapter<PesananRecyclerViewAdapter.PesananViewHolder>{
     private List<Pesanan> pesananList;
     private List<Pesanan> pesananListFiltered;
     private Context context;
     private View view;
+    MeowBottomNavigation bottomNavigation;
+    TextView txtTotalHarga;
     private final ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
+    private SharedPreferences sPreferences;
+    public static final String KEY_ID = "id_reservasi";
+    int id_reservasi;
 
     public PesananRecyclerViewAdapter(Context context, List<Pesanan> productList) {
         this.context = context;
@@ -68,6 +105,10 @@ public class PesananRecyclerViewAdapter extends RecyclerView.Adapter<PesananRecy
         private ImageView ivGambar;
         private LinearLayout mParent;
         private SwipeRevealLayout swipe;
+
+        private TextView txtEdit;
+        private TextView txtDelete;
+
 //        private MaterialButton btnOrder;
 //        private MaterialTextView txtNot;
 
@@ -80,6 +121,8 @@ public class PesananRecyclerViewAdapter extends RecyclerView.Adapter<PesananRecy
             txtSubTotal = itemView.findViewById(R.id.subTotalPesanan);
             mParent = itemView.findViewById(R.id.linear_layout_pesanan);
             swipe = itemView.findViewById(R.id.swipeLayout);
+            txtEdit = itemView.findViewById(R.id.textEdit);
+            txtDelete = itemView.findViewById(R.id.textDelete);
         }
 
         void bindData(Pesanan pesanan){
@@ -109,9 +152,92 @@ public class PesananRecyclerViewAdapter extends RecyclerView.Adapter<PesananRecy
             }
             txtJumlahPesanan.setText(String.valueOf(pesanan.getJumlah()));
 
+            txtEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Dialog dialog;
+                    dialog = new Dialog(context);
+                    dialog.setContentView(R.layout.dialog_tambah_edit);
+                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    dialog.show();
+
+
+                    MaterialButton btnCancel = dialog.findViewById(R.id.btnCancel);
+                    MaterialButton btnSave = dialog.findViewById(R.id.btnAddEdit);
+                    TextInputEditText txtInput = dialog.findViewById(R.id.txtInputEdtTambah);
+                    ImageView imgAdd = dialog.findViewById(R.id.ivTambahEdit);
+                    TextView txtAvailable = dialog.findViewById(R.id.jumlahTersediaAdd);
+                    TextView txtNamaAdd = dialog.findViewById(R.id.namaMenuAdd);
+                    TextView txtHargaAdd = dialog.findViewById(R.id.HargaMenuAdd);
+
+                    double stok = pesanan.getStok_bahan();
+                    double serving = pesanan.getServing_size();
+//
+                    double available = Math.floor(stok/serving) + pesanan.jumlah;
+                    txtNamaAdd.setText(pesanan.getNama_menu());
+                    txtInput.setText(String.valueOf(pesanan.getJumlah()));
+                    if(pesanan.getHarga_menu()==0){
+                        txtHargaAdd.setText("Free");
+                    }else{
+                        txtHargaAdd.setText("IDR "+ formatter.format(pesanan.getHarga_menu()));
+                    }
+                    Glide.with(context)
+                            .load("http://be.atmabbq.xyz/menus/"+pesanan.getGambar_menu())
+                            .placeholder(shimmerDrawable)
+                            .into(imgAdd);
+                    txtAvailable.setText(String.valueOf(available));
+
+                    btnCancel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    btnSave.setText("Save");
+                    btnSave.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            if(txtInput.getText().toString().length() == 0){
+                                txtInput.setError("cannot be null");
+                            }else{
+                                int input = Integer.parseInt(txtInput.getText().toString());
+                                if(input < 1){
+                                    txtInput.setError("should be at least 1");
+                                } else if(input>available) {
+                                    txtInput.setError("should be less than available number");
+                                }else{
+                                    updatePesanan(pesanan.getId_pesanan(),Integer.valueOf(txtInput.getText().toString()));
+                                    dialog.dismiss();
+                                    Fragment fragment = new CartFragment();
+                                    loadFragment(fragment);
+//                                    getPesanan();
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+
+            txtDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    deleteData(pesanan.getId_pesanan());
+                    Fragment fragment = new CartFragment();
+                    loadFragment(fragment);
+//                    getPesanan();
+                }
+            });
         }
     }
 
+    public void loadFragment(Fragment fragment){
+        FragmentManager manager = ((AppCompatActivity)context).getSupportFragmentManager();
+        manager.beginTransaction()
+                .replace(R.id.fragment_cart,fragment)
+                .addToBackStack(null)
+                .commit();
+    }
     public Filter getFilter() {
         return new Filter() {
             @Override
@@ -141,5 +267,144 @@ public class PesananRecyclerViewAdapter extends RecyclerView.Adapter<PesananRecy
                 notifyDataSetChanged();
             }
         };
+    }
+
+    public void updatePesanan(int id, int jumlah){
+        //Pendeklarasian queue
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        final ProgressDialog progressDialog;
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("loading....");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+
+        StringRequest stringRequest = new StringRequest(PUT, PesananApi.ROOT_UPDATE + id, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                progressDialog.dismiss();
+                try {
+                    JSONObject obj = new JSONObject(response);
+                    Toast.makeText(context, obj.getString("message"), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Network unstable, please try again", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressDialog.dismiss();
+                Toast.makeText(context, "Network unstable, please try again", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("jumlah", String.valueOf(jumlah));
+
+                return params;
+            }
+        };
+        queue.add(stringRequest);
+    }
+
+    public void getPesanan(){
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        sPreferences = context.getSharedPreferences("scan", Context.MODE_PRIVATE);
+        id_reservasi = sPreferences.getInt(KEY_ID,Context.MODE_PRIVATE);
+
+        final JsonObjectRequest stringRequest = new JsonObjectRequest(GET, PesananApi.ROOT_SELECT+id_reservasi, null, new com.android.volley.Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    JSONArray jsonArray = response.getJSONArray("data");
+                    List<Pesanan> listUpdate = new ArrayList<>();
+                    int jumlahBaru = 0;
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+
+                        int id_pesanan          = jsonObject.optInt("id_pesanan");
+                        int id_menu           = jsonObject.optInt("id_menu");
+                        int id_reservasi           = jsonObject.optInt("id_reservasi");
+                        int jumlah           = jsonObject.optInt("jumlah");
+                        Double sub_total     = jsonObject.optDouble("sub_total");
+                        int id_stok_keluar           = jsonObject.optInt("id_stok_keluar");
+                        String nama_customer      = jsonObject.optString("nama_customer");
+                        String nama_menu      = jsonObject.optString("nama_menu");
+                        Double harga_menu     = jsonObject.optDouble("harga_menu");
+                        String gambar_menu    = jsonObject.optString("gambar_menu");
+                        int serving_size           = jsonObject.optInt("serving_size");
+                        int stok_bahan           = jsonObject.optInt("stok_bahan");
+
+                        Pesanan pesanan = new Pesanan(id_pesanan,id_menu,id_reservasi,jumlah,sub_total,id_stok_keluar,
+                                nama_customer,gambar_menu,harga_menu,nama_menu,serving_size,stok_bahan);
+                        listUpdate.add(pesanan);
+
+                        jumlahBaru = jumlahBaru+jumlah;
+                    }
+                    pesananListFiltered.clear();
+                    pesananListFiltered = listUpdate;
+                    notifyDataSetChanged();
+
+                    double harga = response.getDouble("total");
+
+                    NumberFormat formatter = new DecimalFormat("#,###");
+
+//                    txtTotalHarga.setText("IDR "+ formatter.format(harga));
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("error",error.getMessage());
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+    public void deleteData(int id){
+        //Pendeklarasian queue
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        final ProgressDialog progressDialog;
+        progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("loading....");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+
+        StringRequest stringRequest = new StringRequest(PUT, PesananApi.ROOT_DELETE + id, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                progressDialog.dismiss();
+                try {
+                    JSONObject obj = new JSONObject(response);
+                    Toast.makeText(context, obj.getString("message"), Toast.LENGTH_SHORT).show();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Network unstable, please try again", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progressDialog.dismiss();
+                Toast.makeText(context, "Network unstable, please try again", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams()
+            {
+                Map<String, String>  params = new HashMap<String, String>();
+
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
 }
